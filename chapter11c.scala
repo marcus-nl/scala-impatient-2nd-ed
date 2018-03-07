@@ -1,3 +1,5 @@
+// chapter 11 - continued
+
 // 11
 import scala.language.dynamics
 class DynamicProps(val props: java.util.Properties) extends Dynamic {

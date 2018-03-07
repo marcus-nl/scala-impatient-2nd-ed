@@ -52,7 +52,7 @@ savingsAccount.withdraw(50)
 savingsAccount.deposit(10)
 savingsAccount.withdraw(50)
 
-// 3 - meh
+// 3 - skipped
 
 // 4
 abstract class Item {
@@ -116,6 +116,14 @@ new Square(4)
 new Square()
 
 // 8
+class Person(val name: String) {
+  override def toString = s"${getClass.getName}[name=$name]"
+}
+
+class SecretAgent(codeName: String) extends Person(codeName) {
+  override val name = "secret"
+  override val toString = "secret"
+}
 // Person has 1 field and 1 getter
 // SecretAgent has an additional 1 field and 1 getter
 

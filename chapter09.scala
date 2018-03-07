@@ -1,3 +1,5 @@
+// chapter 9
+
 import java.io.PrintWriter
 import scala.io.Source
 
@@ -45,15 +47,15 @@ for (str <- """"[^"]*"""".r.findAllIn(src)) {
   println(str)
 }
 
-// 7
-// meh
+// 7 - skipped
+
 // 8
 val page = Source.fromURL("http://www.visitgreece.gr/en/nature/forests").mkString
 for (m <- """<img[^>]+src="([^"]*)"""".r.findAllMatchIn(page)) {
   println(m.group(1))
 }
 
-// 9
+// 9 - seems like IntelliJ doesn't support SAM conversion here?
 import java.nio.file._
 val dirName = """C:\Users\Marcus Klimstra\IdeaProjects\first"""
 val entries = Files.walk(Paths.get(dirName))
@@ -64,5 +66,4 @@ try {
   entries.close()
 }
 
-// 10
-// meh
+// 10 - skipped

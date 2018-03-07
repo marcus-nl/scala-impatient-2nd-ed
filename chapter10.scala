@@ -1,9 +1,8 @@
+// chapter 10
 import java.awt.Point
 import java.beans.{PropertyChangeEvent, PropertyChangeListener}
 
 import scala.collection.mutable.{HashMap, MultiMap, Set}
-
-import chapter10._
 
 // 1
 trait RectangleLike {
@@ -38,7 +37,7 @@ class OrderedPoint extends Point with scala.math.Ordered[Point] {
   }
 }
 
-// 3
+// 3 - wow, that's a huge inheritance tree. could have made a mistake here...
 // BitSet >> BitSetLike >> SortedSetLike >> Sorted >> SetLike >> Set >> IterableLike
 // >> GenIterableLike >> Parallelizable >> GenTraversableLike >> GenTraversableOnce
 // >> FIlterMonadic >> HasNewBuilder >> TraversableLike >> Equals >>
@@ -47,6 +46,24 @@ class OrderedPoint extends Point with scala.math.Ordered[Point] {
 // >> Iterable >> Traversable
 
 // 4
+trait Logger {
+  def log(msg: String): Unit
+}
+
+trait CryptoLogger extends Logger {
+  val key = 3
+  abstract override def log(msg: String): Unit = {
+    super.log(encrypt(msg))
+  }
+  def encrypt(msg: String): String = {
+    msg.map((c: Char) => (c + key).toChar)
+  }
+}
+
+trait ConsoleLogger extends Logger {
+  override def log(msg: String): Unit = println(msg)
+}
+
 class ConcreteLogger extends ConsoleLogger {}
 def logger1 = new ConcreteLogger
 def logger2 = new ConcreteLogger with CryptoLogger
@@ -98,14 +115,37 @@ observablePoint.setLocation(4, 5)
 // 6
 // by making a trait for composite components, i.e. ContainerLike
 
-// 7
-// meh. this applies when a trait's changes are reflected in classes with the trait
+// 7 - skipped making the example
+// his should apply when a trait's changes are reflected in classes with the trait
 // e.g. when a field is changed
 
-// 8
-// meh
+// 8 - skipped
 
 // 9: something like this
+import java.io.FileInputStream
+
+trait Buffered {
+  this: java.io.InputStream with Logger =>
+
+  val buffer = new Array[Byte](128)
+  var pos = 0
+  var limit = -1
+  abstract override def read(): Int = {
+    fill()
+    val result = buffer(pos)
+    pos += 1
+    result
+  }
+  def fill(): Unit = {
+    if (pos > limit) {
+      log("Filling buffer")
+      limit = read(buffer)
+    }
+  }
+}
+
+class BufferedFileInputStream extends FileInputStream("asdf.txt")
+  with Buffered with ConsoleLogger {}
 
 // 10: see 9
 

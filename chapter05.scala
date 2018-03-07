@@ -1,7 +1,5 @@
-import javax.print.attribute.standard.PrinterMoreInfoManufacturer
-
-import scala.beans.BeanProperty
 // chapter 5
+import scala.beans.BeanProperty
 
 // 1
 class Counter(private var value: Int = 0) {

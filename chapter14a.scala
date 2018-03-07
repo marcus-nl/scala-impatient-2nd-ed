@@ -1,5 +1,6 @@
-// 1
-// meh
+// chapter 14
+
+// 1 - skipped
 
 // 2
 def swap(pair: (Int,Int)) = pair match {
@@ -17,6 +18,7 @@ def arrswap(array: Array[Int]) = array match {
 }
 arrswap(Array(1,2,3,4))
 
+// or in place:
 def arraySwapInPlace(array: Array[Int]): Unit = array match {
   case Array(a, b, rest @ _*) => { array(0) = b; array(1) = a }
 }
@@ -58,10 +60,10 @@ leafSum2(tree)
 
 // 6
 sealed abstract class BinTree
-case class Leaf(value: Int) extends Tree
-case class Node(left: Tree, right: Tree) extends Tree
+case class Leaf(value: Int) extends BinTree
+case class Node(left: BinTree, right: BinTree) extends BinTree
 
-def leafSum(tree: Tree): Int = tree match {
+def leafSum(tree: BinTree): Int = tree match {
   case Leaf(value) => value
   case Node(left, right) => leafSum(left) + leafSum(right)
 }

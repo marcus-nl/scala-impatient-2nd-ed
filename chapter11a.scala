@@ -67,26 +67,6 @@ Amount(33, 33) / 3
 Amount(3, 14) == Amount(1, 10) + Amount(2, 4)
 
 // 5
-/*
-class Table(r: List[List[String]]) {
-  val rows: List[List[String]] = r
-  override def toString = {
-    "<table>" +
-      rows.map(_.map(str => s"<td>$str</td>").mkString).map(str => s"<tr>$str</tr>") +
-      "</table"
-  }
-  def |(s: String) = {
-    val newRows = rows match {
-      case Nil => s
-    }
-    new Table(newRows)
-  }
-  def ||(s: String) = new Table(rows :: Nil)
-}
-object Table {
-  def apply() = new Table(Nil)
-}
-*/
 class Table(initial: String) {
   val value = initial
 

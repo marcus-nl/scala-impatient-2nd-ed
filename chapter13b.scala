@@ -15,7 +15,6 @@ indexes2("Mississippi")
 def merge[K,V,X](map: Map[K,V], entry: (K,X))(fun: (V, X) => V) = entry match {
   case (k, v) => map + (k -> fun(map(k), v))
 }
-
 def indexes2(s: String): Map[Char,List[Int]] = {
   val initial = HashMap[Char,List[Int]]().withDefaultValue(Nil)
   s.zipWithIndex.foldLeft(initial)(merge(_, _)((lst, i) => i :: lst))
@@ -102,7 +101,7 @@ def mergeAll[K,V](a: Map[K,V], b: Map[K,V])(fun: (V, V) => V): Map[K,V] = {
   b.map(mergeEntry)
 }
 
-val fn3 = """C:\Users\Marcus Klimstra\longwords.txt"""
+val fn3 = """~/longwords.txt"""
 val str = Source.fromFile(fn3).mkString
 val initial = Map[Char, Int]()
 str.par.aggregate(initial)((map, ch) => merge2(map, (ch -> 1))(_ + _),

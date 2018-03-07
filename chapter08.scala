@@ -98,8 +98,8 @@ abstract class Shape {
   def centerPoint: Point
 }
 class Rectangle(val topLeft: Point,
-                val width: Double, val height: Double // or bottomRicht: Point
-               ) extends Shape {
+                val width: Double, val height: Double) // or bottomRight: Point
+  extends Shape {
   def centerPoint = new Point(topLeft.x + width / 2.0, topLeft.y + height / 2.0)
 }
 class Circle(override val centerPoint: Point, val radius: Double) extends Shape {}

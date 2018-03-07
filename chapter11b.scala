@@ -1,7 +1,6 @@
 // chapter 11 - continued
 
 // 6
-
 class AsciiArt(private val lines: Array[String]) {
   override def toString = '\n' + lines.mkString("\n")
   val width = lines.map(_.length).max

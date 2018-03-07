@@ -18,10 +18,11 @@ x = y = 1
 
 // 4
 for (x <- 10.to(0, -1)) println(x)
+for (x <- 10 to(0, -1)) println(x) // ah, this works as well
 
 // 5
 def countdown(n: Int) =
-  for (x <- n.to(0, -1)) println(x)
+  for (x <- n to(0, -1)) println(x)
 countdown(10)
 
 // 6
@@ -53,7 +54,7 @@ exp(3, 5)
 exp(2, -5)
 exp(5, 0)
 
-// 11
+// 11 - need to use REPL mode for this to work in IntelliJ interactive mode
 implicit class DateInterpolator(val sc: StringContext) extends AnyVal {
   def date(args: Any*): LocalDate = {
     if (args.size != 3) throw new Exception("3 arguments required")

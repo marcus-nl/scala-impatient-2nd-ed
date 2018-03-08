@@ -20,7 +20,7 @@ arrswap(Array(1,2,3,4))
 
 // or in place:
 def arraySwapInPlace(array: Array[Int]): Unit = array match {
-  case Array(a, b, rest @ _*) => { array(0) = b; array(1) = a }
+  case Array(a, b, _*) => { array(0) = b; array(1) = a }
 }
 val arr = Array(1,2,3,4)
 arraySwapInPlace(arr)

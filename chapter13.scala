@@ -1,4 +1,4 @@
-// chapter 13 - continued
+// chapter 13
 import scala.collection.immutable._
 import scala.collection.mutable.ListBuffer
 import scala.io.Source

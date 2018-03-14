@@ -147,4 +147,18 @@ val f: Function[Int,Int] = x => x * x
 //printValues(f, 3, 6) // hmm... causes NoSuchMethodException: lambda.apply(int)
 printValues(Array(1, 1, 2, 3, 5, 8, 13, 21, 23, 55), 3, 6)
 
-// 9 - TODO
+// 9
+abstract class Dim[T](val value: Double, val name: String) {
+  self =>
+  protected def create(v: Double): T //self.type
+  def +(other: Dim[T]) = create(value + other.value)
+  override def toString = s"$value $name"
+}
+
+class Seconds(v: Double) extends Dim[Seconds](v, "s") {
+  override def create(v: Double): Seconds = new Seconds(v)
+}
+
+class Meters(v: Double) extends Dim[Seconds](v, "s") {
+  override def create(v: Double) = ??? //new Seconds(v)
+}

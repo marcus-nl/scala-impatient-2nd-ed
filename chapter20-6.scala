@@ -14,7 +14,7 @@ case class Operator(op: String, left: Expr, right: Expr) extends Expr {
     case "*" => left.eval * right.eval
     case "/" => left.eval / right.eval
     case "%" => left.eval % right.eval
-    case "^" => left.eval ^ right.eval
+    case "^" => Math.pow(left.eval, right.eval).toInt
   }
 }
 

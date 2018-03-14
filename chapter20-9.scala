@@ -1,6 +1,10 @@
-// 8
+// 9: 8 with operators "and", "or" and the if-else expression (not statement).
+// skipped while, since that cannot be expressed as an expression..
 import scala.collection.mutable
 import scala.util.parsing.combinator.syntactical.StandardTokenParsers
+
+def and(a: Int, b: Int): Int = if (a == 1 && b == 1) 1 else 0
+def or(a: Int, b: Int):  Int = if (a == 1 || b == 1) 1 else 0
 
 class Context {
   val vars = new mutable.HashMap[String,Int]()
@@ -20,12 +24,14 @@ case class Number(value: Int) extends Expr {
 }
 case class Operator(op: String, left: Expr, right: Expr) extends Expr {
   override def eval(ctx: Context) = op match {
-    case "+" => left.eval(ctx) + right.eval(ctx)
-    case "-" => left.eval(ctx) - right.eval(ctx)
-    case "*" => left.eval(ctx) * right.eval(ctx)
-    case "/" => left.eval(ctx) / right.eval(ctx)
-    case "%" => left.eval(ctx) % right.eval(ctx)
-    case "^" => Math.pow(left.eval(ctx), right.eval(ctx)).toInt
+    case "or"   => or(left.eval(ctx),  right.eval(ctx))
+    case "and"  => and(left.eval(ctx), right.eval(ctx))
+    case "+"    => left.eval(ctx) + right.eval(ctx)
+    case "-"    => left.eval(ctx) - right.eval(ctx)
+    case "*"    => left.eval(ctx) * right.eval(ctx)
+    case "/"    => left.eval(ctx) / right.eval(ctx)
+    case "%"    => left.eval(ctx) % right.eval(ctx)
+    case "^"    => Math.pow(left.eval(ctx), right.eval(ctx)).toInt
   }
 }
 case class Ref(name: String) extends Expr {
@@ -41,8 +47,13 @@ case class Assign(name: String, expr: Expr) extends Expr {
     value
   }
 }
+case class If(cond: Expr, trueExpr: Expr, falseExpr: Expr) extends Expr {
+  override def eval(ctx: Context): Int =
+    if (cond.eval(ctx) != 0) trueExpr.eval(ctx) else falseExpr.eval(ctx)
+}
 
 class ExprTreeParser extends StandardTokenParsers {
+  lexical.reserved += ("and", "or", "if", "then", "else")
   lexical.delimiters += ("+", "-", "*", "/", "%", "^", "=", "(", ")")
 
   // left-associative binary expression
@@ -60,17 +71,24 @@ class ExprTreeParser extends StandardTokenParsers {
       case l ~ Some(op ~ r) => Operator(op, l, r)
     }
 
-  def expr = binOpLeft(("+" | "-"), term)
+  def expr = orExpr
 
-  def term = binOpLeft(("*"|"/"|"%"), factor)
-
-  def factor = binOpRight("^", primary)
+  def orExpr    = binOpLeft("or", andExpr)
+  def andExpr   = binOpLeft("and", addExpr)
+  def addExpr   = binOpLeft(("+" | "-"), multExpr)
+  def multExpr  = binOpLeft(("*"|"/"|"%"), powExpr)
+  def powExpr   = binOpRight("^", primary)
 
   def primary: Parser[Expr] = {
+    ifExpr |
     ident ~ "=" ~ expr  ^^ { case id ~ "=" ~ e => Assign(id, e) } |
     ident               ^^ { id => new Ref(id) } |
     numericLit          ^^ { n => Number(n.toInt) } |
     "(" ~ expr ~ ")"    ^^ { case "(" ~ e ~ ")"  => e }
+  }
+
+  def ifExpr: Parser[Expr] = "if" ~ expr ~ "then" ~ expr ~ "else" ~ expr ^^ {
+    case "if" ~ c ~ "then" ~ t ~ "else" ~ f => If(c, t, f)
   }
 
   def parseAll[T](p: Parser[T], in: String): ParseResult[T] =
@@ -91,6 +109,9 @@ def test(input: String, expected: Int): Unit = {
 
 test("1 + n", 1 + 0)
 test("n = 3 - 4 - 5", 3 - 4 - 5) // -6
-test("n * 2 + 12", -6 * 2 + 12)
+test("n + 6", -6 + 6)
 test("(4 ^ 2) ^ 3", Math.pow(Math.pow(4, 2), 3).toInt)
 test("out = 4 ^ 2 ^ 3", Math.pow(4, Math.pow(2, 3)).toInt)
+test("1 and 1", 1)
+test("1 and 1 or 0", 1)
+test("1 + if 1 and 0 then 2 else 3", 1 + 3)

@@ -45,22 +45,26 @@ case class Assign(name: String, expr: Expr) extends Expr {
 class ExprTreeParser extends StandardTokenParsers {
   lexical.delimiters += ("+", "-", "*", "/", "%", "^", "=", "(", ")")
 
-  def expr: Parser[Expr] = term ~ rep(("+" | "-") ~ term) ^^ {
-    case t ~ rep => rep.foldLeft(t)((acc, r) => r match {
-      case op ~ t => Operator(op, acc, t)
-    })
-  }
+  // left-associative binary expression
+  def binOpLeft(op: Parser[String], next: Parser[Expr]): Parser[Expr] =
+    next ~ rep(op ~ next) ^^ {
+      case i ~ rep => rep.foldLeft(i)((acc, r) => r match {
+        case op ~ t => Operator(op, acc, t)
+      })
+    }
 
-  def term: Parser[Expr] = factor ~ rep(("*"|"/"|"%") ~ factor) ^^ {
-    case f ~ rep => rep.foldLeft(f)((acc, r) => r match {
-      case op ~ f => Operator(op, acc, f)
-    })
-  }
+  // right-associative binary expression
+  def binOpRight(op: Parser[String], next: Parser[Expr]): Parser[Expr] =
+    next ~ opt(op ~ expr) ^^ {
+      case l ~ None => l
+      case l ~ Some(op ~ r) => Operator(op, l, r)
+    }
 
-  def factor: Parser[Expr] = primary ~ opt("^" ~ expr) ^^ {
-    case p ~ None => p
-    case p ~ Some(op ~ e) => Operator(op, p, e)
-  }
+  def expr = binOpLeft(("+" | "-"), term)
+
+  def term = binOpLeft(("*"|"/"|"%"), factor)
+
+  def factor = binOpRight("^", primary)
 
   def primary: Parser[Expr] = {
     ident ~ "=" ~ expr  ^^ { case id ~ "=" ~ e => Assign(id, e) } |

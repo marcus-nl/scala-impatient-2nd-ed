@@ -1,6 +1,7 @@
 // 10: 9 with functions
 import scala.collection.mutable
 import scala.util.parsing.combinator.syntactical.StandardTokenParsers
+import scala.util.parsing.input.Positional
 
 def and(a: Int, b: Int): Int = if (a == 1 && b == 1) 1 else 0
 def or(a: Int, b: Int):  Int = if (a == 1 || b == 1) 1 else 0
@@ -30,7 +31,7 @@ class Context(val parent: Context, initial: Seq[(String,Int)]) {
     funs(name) = new Fun(name, params, expr)
 }
 
-abstract class Expr {
+abstract class Expr extends Positional {
   def eval(ctx: Context): Int
 }
 case class Number(value: Int) extends Expr {
@@ -87,19 +88,21 @@ class ExprTreeParser extends StandardTokenParsers {
   lexical.delimiters += ("+", "-", "*", "/", "%", "^", "=", "(", ")", ",")
 
   // left-associative binary expression
-  def binOpLeft(op: Parser[String], next: Parser[Expr]): Parser[Expr] =
+  def binOpLeft(op: Parser[String], next: Parser[Expr]): Parser[Expr] = positioned {
     next ~ rep(op ~ next) ^^ {
       case i ~ rep => rep.foldLeft(i)((acc, r) => r match {
         case op ~ t => Operator(op, acc, t)
       })
     }
+  }
 
   // right-associative binary expression
-  def binOpRight(op: Parser[String], next: Parser[Expr]): Parser[Expr] =
+  def binOpRight(op: Parser[String], next: Parser[Expr]): Parser[Expr] = positioned {
     next ~ opt(op ~ expr) ^^ {
       case l ~ None => l
       case l ~ Some(op ~ r) => Operator(op, l, r)
     }
+  }
 
   def expr = orExpr
 
@@ -109,7 +112,7 @@ class ExprTreeParser extends StandardTokenParsers {
   def multExpr  = binOpLeft(("*"|"/"|"%"), powExpr)
   def powExpr   = binOpRight("^", primary)
 
-  def primary: Parser[Expr] = {
+  def primary: Parser[Expr] = positioned {
     funDef | funCall | ifExpr |
     ident ~ "=" ~ expr  ^^ { case id ~ "=" ~ e => Assign(id, e) } |
     ident               ^^ { id => new Ref(id) } |
@@ -144,9 +147,9 @@ def test(input: String, expected: Int): Unit = {
     case parser.Success(e: Expr, _) => {
       val actual = e.eval(ctx)
       assert(actual == expected, s"parse result of $input should be $expected, but is $actual")
-      println(s"Ok: $input -> $actual")
+      println(s"Ok: $input at ${e.pos} -> $actual")
     }
-    case parser.Failure(msg, _) =>  println(s"Failure: $msg")
+    case parser.Failure(msg, _) => println(s"Failure: $msg")
     case parser.Error(msg, _)   => println(s"Error: $msg")
   }
 }
@@ -161,3 +164,4 @@ test("1 and 1 or 0", 1)
 test("1 + if 1 and 0 then 2 else 3", 1 + 3)
 test("def avg(a, b, c) = (a + b + c) / 3", 0)
 test("avg(5, 6, 7)", (5 + 6 + 7) / 3)
+test("\n\n\n    4 + 5", 4 + 5) // note that the position is 4.5

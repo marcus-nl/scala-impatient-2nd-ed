@@ -92,7 +92,33 @@ new Point(4, 5) < new Point(5, 6) // true
 
 // how to switch: by either importing LexographicPointOrdering or DistanceToOriginPointOrdering
 
-// 8 - TODO
+// 8a
+case class Delimiters(left: String, right: String)
+
+def quote(what: String)(implicit delims: Delimiters) =
+  delims.left + what + delims.right
+
+quote("Hello World")(Delimiters("\"", "\""))
+
+object FrenchPunctuation {
+  implicit val quoteDelimiters = Delimiters("<<", ">>")
+}
+
+import FrenchPunctuation._
+quote("Bonjour le Monde")
+
+implicitly[Delimiters] // results in Delimiters(<<,>>)
+
+// 8b
+
+// there is no value for Ordered[Fraction], only an implicit class RichFraction,
+// so this won't work:
+//implicitly[Ordered[Fraction]]
+
+// but since the implicit class RichFraction makes the implicit conversion
+// from Fraction to Ordered[Fraction] possible, this will:
+implicitly[Fraction => Ordered[Fraction]] // results in  $Lambda$1571/2065531617@28301904
+
 
 // 9
 // Ordered is meant to be extended by a type which then has a single ordering,
@@ -132,6 +158,31 @@ implicit object NumberLikeString extends NumberLike[String] {
 
 average("Hello", "World")
 
-// 12 - TODO
+// 12 - my best guess
+// the constraint T =:= U tests whether T equals U
+// =:=[T,U] is a function with type T => U
+// =:= has a companion object with an implicit method tpEquals which has type A =:= A,
+// which can thus only be applied if T and U are the same type.
 
-// 13 - TODO
+
+// 13
+"abc".map(_.toUpper)  // Elem is still Char after map
+"abc".map(_.toInt)    // Elem is Int
+
+/* Predef has 2 CanBuildFrom objects for Strings:
+
+  implicit val StringCanBuildFrom: CanBuildFrom[String, Char, String] = new CanBuildFrom[String, Char, String] {
+    def apply(from: String) = apply()
+    def apply()             = mutable.StringBuilder.newBuilder
+  }
+
+and
+
+  implicit def fallbackStringCanBuildFrom[T]: CanBuildFrom[String, T, immutable.IndexedSeq[T]] =
+    new CanBuildFrom[String, T, immutable.IndexedSeq[T]] {
+      def apply(from: String) = immutable.IndexedSeq.newBuilder[T]
+      def apply() = immutable.IndexedSeq.newBuilder[T]
+    }
+
+the 1st object matches in case Elem is Char. otherwise the 2nd one does.
+ */

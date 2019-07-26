@@ -48,9 +48,10 @@ class Amount(w: Int, f: Int) {
   def fract = if (f >= 0) (f % 100) else (100 - abs(f) % 100)
   override def toString = s"€ $whole,$fract"
   def == (that: Amount) = this.whole == that.whole && this.fract == that.fract
-  def < (that: Amount) = this.whole < that.whole || this.fract < that.fract
+  def < (that: Amount) = this.whole < that.whole || this.whole == that.whole && this.fract < that.fract
   def + (that: Amount) = Amount(this.whole + that.whole, this.fract + that.fract)
   def - (that: Amount) = Amount(this.whole - that.whole, this.fract - that.fract)
+  // * and / operators with Amount arguments would make no sense, but this does:
   def * (mlt: Int) = Amount(this.whole * mlt, this.fract * mlt)
   def / (div: Int) = Amount(this.whole / div, this.fract / div)
 }
@@ -64,6 +65,7 @@ Amount(4, -86)
 Amount(4, 42) - Amount(1, 88)
 Amount(3, 14) * 42
 Amount(33, 33) / 3
+Amount(3, 1) < Amount(2, 14)
 Amount(3, 14) == Amount(1, 10) + Amount(2, 4)
 
 // 5

@@ -28,7 +28,7 @@ import scala.xml.parsing.XhtmlParser
 val source = scala.io.Source.fromFile("~/scala/index.html", "UTF-8")
 val parser = new XhtmlParser(source)
 val doc = parser.initialize.document
-for (img <- doc \\ "img" if (img.attribute("alt") == None)) {
+for (img <- doc \\ "img" if img.attribute("alt").isEmpty) {
   println(img)
 }
 
@@ -58,7 +58,7 @@ dlToMap(dl)
 import scala.xml.transform.{RewriteRule, RuleTransformer}
 val addAlt = new RewriteRule {
   override def transform(n: Node) = n match {
-    case img @ <img/> if (img.attribute("alt") == None) =>
+    case img @ <img/> if img.attribute("alt").isEmpty =>
       img.asInstanceOf[Elem] % Attribute(null, "alt", "TODO", Null)
     case _ => n
   }

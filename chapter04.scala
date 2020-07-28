@@ -10,7 +10,7 @@ val prices = Map("bike" -> 500.0, "vacuum" -> 110.95, "mattress" -> 400.0, "tesl
 val discounts = prices.mapValues(_ * 0.90)
 
 // 2
-val file = new File("WindowsCodecsRaw.txt")
+val file = new File("inputs/longwords.txt")
 def iterateWordsInFile(f: File): Iterator[String] =
   new Scanner(f).asScala
 

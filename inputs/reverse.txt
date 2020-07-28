@@ -1,0 +1,12 @@
+}
+  }
+    println("Hello")
+  } else {
+    Console.err.println("Invalid password")
+  if (pwd != "secret") {
+  val pwd = scala.io.StdIn.readLine("Enter password: ")
+  getProperty("user.name")
+  import java.lang.System._
+object SecureHello extends App {
+
+package chapter7

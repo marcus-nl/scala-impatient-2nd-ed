@@ -127,7 +127,7 @@ def mergeAll[K,V](a: Map[K,V], b: Map[K,V])(fun: (V, V) => V): Map[K,V] = {
   b.map(mergeEntry)
 }
 
-val fn3 = """~/scala/longwords.txt"""
+val fn3 = "inputs/longwords.txt"
 val str = Source.fromFile(fn3).mkString
 val initial = Map[Char, Int]()
 str.par.aggregate(initial)((map, ch) => merge2(map, (ch -> 1))(_ + _),
